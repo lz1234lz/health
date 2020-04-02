@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>健康数据上报</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+<div id="app" class="container" style="margin-top: 5%">
+    <form>
+        <div class="form-group">
+            <label>姓名</label>
+            <input type="text" class="form-control" v-model="name">
+            <small v-show="nameerror" style="color: red">请输入姓名</small>
+        </div>
+        <div class="form-group">
+            <label>年龄</label>
+            <input type="number" class="form-control" v-model.number="age">
+            <small v-show="ageerror" style="color: red">请输入正确的年龄</small>
+        </div>
+        <div class="form-group">
+            <label>温度</label>
+            <input type="number" class="form-control" v-model.number="tempture">
+            <small v-show="temperror" style="color: red">请输入正确的温度</small>
+        </div>
+        <div class="form-group">
+            <label>地址</label>
+            <input type="text" class="form-control" v-model="address">
+            <small v-show="addresserror" style="color: red">请输入地址</small>
+        </div>
+        <button type="button" class="btn btn-primary" @click="submit">提交</button>
+    </form>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            age: '',
+            csrf: '',
+            name: '',
+            tempture: '',
+            address: '',
+            ageerror: true,
+            temperror: true,
+            addresserror: true,
+            nameerror: true
+        },
+        methods: {
+            submit: function () {
+                this.gettoken()
+                if (this.ageerror || this.temperror || this.addresserror || this.nameerror) {
+                    alert('请检查输入')
+                    return
+                }
+                $.ajax({
+                    url:'/day/',
+                    type:"POST",
+                    data:{
+                        csrfmiddlewaretoken:'{{ csrf_token }}',
+                        name: this.name,
+                        age: this.age,
+                        tempture: this.tempture,
+                        address: this.address
+                    },
+                    success: function(val) {
+                        if (val.status == 'ok') {
+                            window.location.href = '/success/';
+                        } else if(val.status == 'error') {
+                            window.location.href = '/error/';
+                        }
+                    }
+                })
+            },
+            gettoken: function () {
+                this.csrf = $.cookie('csrftoken')
+            }
+        },
+        watch: {
+            name: function (val) {
+                if (val != '') {
+                    this.nameerror = false
+                } else {
+                    this.nameerror = true
+                }
+            },
+            age: function (val) {
+                if (val<0 || val > 120){
+                    this.ageerror = true
+                } else {
+                    this.ageerror = false
+                }
+            },
+            tempture: function (val) {
+                if (val<30 || val > 45){
+                    this.temperror = true
+                } else {
+                    this.temperror = false
+                }
+            },
+            address: function (val) {
+                if (val != '') {
+                    this.addresserror = false
+                } else {
+                    this.addresserror = true
+                }
+            }
+        }
+    })
+
+</script>
+</html>
