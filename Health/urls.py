@@ -19,6 +19,7 @@ from day.views import Index,Success,Error
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', Index.as_view()),
     path('day/', Index.as_view()),
     path('success/',Success.as_view()),
     path('error/',Error.as_view())
