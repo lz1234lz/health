@@ -22,11 +22,10 @@ def get_mail_msg(from_addr,to_addr):
     return msg
 
 
-def send_mail(to_addr=''):
+def send_mail(to_addr='1556502096@qq.com'):
     #发送邮件
     from_addr="1051520590@qq.com"
     password="vrjqpuxcpubobbdi"
-    to_addr = '1556502096@qq.com'
     smtp_server = 'smtp.qq.com'
     server = smtplib.SMTP_SSL(host=smtp_server)
     server.connect(host=smtp_server, port=465)
@@ -55,12 +54,14 @@ def get_excel(data):
         worksheet.write(index+2,1, item[1])
     workbook.save('userreport.xls')
 
-def day_job():
+def day_job(email_add):
     data = get_data()
     get_excel(data)
-    send_mail()
+    send_mail(email_add)
 
 if __name__ == "__main__":
-    schedule.every().day.at("23:59").do(day_job)
+    email_add = input("请输入邮箱")
+    print('长传程序已自动运行')
+    schedule.every().day.at("23:59").do(day_job,email_add)
     while True:
         schedule.run_pending()
